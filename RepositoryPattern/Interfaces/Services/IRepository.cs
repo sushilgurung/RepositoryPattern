@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RepositoryPattern.Interfaces.Services
@@ -48,17 +50,27 @@ namespace RepositoryPattern.Interfaces.Services
 
         #region Add
         T Add(T entity);
-        Task<T> AddAsync(T entity);
+        Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
+        IEnumerable<T> AddRange(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+        Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
         #endregion
 
         #region Update
         T Update(T entity);
-        Task UpdateAsync(T entity);
+        Task<T> UpdateAsync(T entity);
+        IEnumerable<T> UpdateRange(List<T> entities);
+        Task<IEnumerable<T>> UpdateRangeAsync(List<T> entities);
         #endregion
 
         #region Save Changes
         int SaveChanges();
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        #endregion
+
+        #region Transaction Management
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
         #endregion
     }
 }

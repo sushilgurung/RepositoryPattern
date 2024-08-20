@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using RepositoryPattern.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RepositoryPattern.Services
@@ -12,6 +14,7 @@ namespace RepositoryPattern.Services
     public class Repository<T> : IRepository<T> where T : class
     {
         public readonly DbContext _dbContext;
+        private IDbContextTransaction _transaction;
         public Repository(DbContext dbContext)
         {
             this._dbContext = dbContext;
@@ -259,14 +262,6 @@ namespace RepositoryPattern.Services
         }
 
 
-
-        //public T FirstOrDefault(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-
-
         public T FirstOrDefault(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
         {
             if (predicate == null)
@@ -367,24 +362,54 @@ namespace RepositoryPattern.Services
         #region Add
         public T Add(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Add(entity);
+            return entity;
         }
 
-        public Task<T> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            await _dbContext.Set<T>().AddAsync(entity);
+            return entity;
         }
+
+        public IEnumerable<T> AddRange(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+        {
+            _dbContext.Set<T>().AddRange(entities);
+            return entities;
+        }
+
+        public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+        {
+            await _dbContext.Set<T>().AddRangeAsync(entities, cancellationToken);
+            return entities;
+        }
+
+
         #endregion
 
         #region Update
         public T Update(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Update(entity);
+            return entity;
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Update(entity);
+            return await Task.FromResult(entity);
+        }
+
+        public IEnumerable<T> UpdateRange(List<T> entities)
+        {
+            _dbContext.Set<T>().UpdateRange(entities);
+            return entities;
+        }
+
+        public async Task<IEnumerable<T>> UpdateRangeAsync(List<T> entities)
+        {
+            _dbContext.Set<T>().UpdateRange(entities);
+            return await Task.FromResult<IEnumerable<T>>(entities);
         }
 
         #endregion
@@ -396,19 +421,69 @@ namespace RepositoryPattern.Services
             return _dbContext.SaveChanges();
         }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.SaveChangesAsync();
+            return await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        #endregion
+
+
+
+        #region Transaction Management
+
+        /// <summary>
+        /// Begins a new transaction asynchronously.
+        /// </summary>
+        /// <returns>The transaction object.</returns>
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            _transaction = await _dbContext.Database.BeginTransactionAsync();
+            return _transaction;
         }
 
+        /// <summary>
+        /// Commits the current transaction asynchronously.
+        /// </summary>
+        public async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await SaveChangesAsync();
+                _transaction?.Commit();
+            }
+            catch
+            {
+                await RollbackTransactionAsync();
+                throw;
+            }
+            finally
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+            }
+        }
 
-
-
-
-
-
+        /// <summary>
+        /// Rolls back the current transaction asynchronously.
+        /// </summary>
+        public async Task RollbackTransactionAsync()
+        {
+            try
+            {
+                if (_transaction != null)
+                {
+                    await _transaction.RollbackAsync();
+                }
+            }
+            finally
+            {
+                _transaction?.Dispose();
+                _transaction = null;
+            }
+        }
 
         #endregion
+
 
     }
 }
