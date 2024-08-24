@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace RepositoryPattern.Services
 {
@@ -30,7 +31,6 @@ namespace RepositoryPattern.Services
                 return GetQueryable();
             }
         }
-
 
         /// <summary>
         /// 
@@ -119,8 +119,8 @@ namespace RepositoryPattern.Services
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }
-        #endregion
 
+        #endregion
 
         #region FirstorDefault
 
@@ -132,7 +132,6 @@ namespace RepositoryPattern.Services
         {
             return _dbContext.Set<T>().FirstOrDefault();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -140,6 +139,14 @@ namespace RepositoryPattern.Services
         public async Task<T> FirstOrDefaultAsync()
         {
             return await _dbContext.Set<T>().FirstOrDefaultAsync();
+        }
+        public T FirstOrDefaultAsNoTracking()
+        {
+            return _dbContext.Set<T>().AsNoTracking().FirstOrDefault();
+        }
+        public async Task<T> FirstOrDefaultAsyncAsNoTracking()
+        {
+            return await _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync();
         }
 
 
@@ -152,7 +159,6 @@ namespace RepositoryPattern.Services
         {
             return _dbContext.Set<T>().Where(predicate).FirstOrDefault();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -162,6 +168,15 @@ namespace RepositoryPattern.Services
         {
             return await _dbContext.Set<T>().Where(predicate).FirstOrDefaultAsync();
         }
+        public T FirstOrDefaultAsNoTracking(Expression<Func<T, bool>> predicate)
+        {
+            return _dbContext.Set<T>().Where(predicate).AsNoTracking().FirstOrDefault();
+        }
+        public async Task<T> FirstOrDefaultAsyncAsNoTracking(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).AsNoTracking().FirstOrDefaultAsync();
+        }
+
 
 
         /// <summary>
@@ -211,7 +226,6 @@ namespace RepositoryPattern.Services
             }
             return orderedQuery.FirstOrDefault();
         }
-
         /// <summary>
         /// Retrieves the first or default record, applying sorting criteria based on the provided order-by specifications.
         /// </summary>
@@ -260,7 +274,52 @@ namespace RepositoryPattern.Services
 
             return await orderedQuery.FirstOrDefaultAsync();
         }
+        public T FirstOrDefaultAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
 
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return orderedQuery.AsNoTracking().FirstOrDefault();
+        }
+        public async Task<T> FirstOrDefaultAsyncAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return await orderedQuery.AsNoTracking().FirstOrDefaultAsync();
+        }
 
         public T FirstOrDefault(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
         {
@@ -289,9 +348,6 @@ namespace RepositoryPattern.Services
 
             return orderedQuery.FirstOrDefault();
         }
-
-
-
         /// <summary>
         /// Retrieves the first or default record based on the provided filtering predicate and sorting criteria.
         /// </summary>
@@ -355,6 +411,191 @@ namespace RepositoryPattern.Services
             return await orderedQuery.FirstOrDefaultAsync();
         }
 
+        public T FirstOrDefaultAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return orderedQuery.AsNoTracking().FirstOrDefault();
+        }
+        public virtual async Task<T> FirstOrDefaultAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return await orderedQuery.AsNoTracking().FirstOrDefaultAsync();
+        }
+
+        #endregion
+
+        #region find
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+        {
+            return _dbContext.Set<T>().Where(predicate).ToList();
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate)
+        {
+            return _dbContext.Set<T>().Where(predicate).AsNoTracking().ToList();
+        }
+
+        public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).AsNoTracking().ToListAsync();
+        }
+
+
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate);
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return orderedQuery.ToList();
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate);
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return await orderedQuery.ToListAsync();
+        }
+
+
+        public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return orderedQuery.AsNoTracking().ToList();
+        }
+
+        public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            if (orderBys == null || !orderBys.Any())
+                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+
+            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
+
+            // Apply the first sorting criterion
+            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
+                ? query.OrderByDescending(orderBys[0].KeySelector)
+                : query.OrderBy(orderBys[0].KeySelector);
+
+            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
+            for (int i = 1; i < orderBys.Length; i++)
+            {
+                // Additional sorting orders
+                var orderBy = orderBys[i];
+                orderedQuery = orderBy.Descending
+                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
+                    : orderedQuery.ThenBy(orderBy.KeySelector);
+            }
+            return await orderedQuery.AsNoTracking().ToListAsync();
+        }
 
 
         #endregion
@@ -414,6 +655,86 @@ namespace RepositoryPattern.Services
 
         #endregion
 
+        #region Delete
+        public void Remove(T entity) =>
+            _dbContext.Set<T>().Remove(entity);
+
+        public async Task RemoveAsync(T entity) =>
+            await Task.FromResult(_dbContext.Set<T>().Remove(entity));
+
+        public void RemoveRange(IEnumerable<T> entities) =>
+              _dbContext.Set<T>().RemoveRange(entities);
+
+        public async Task RemoveRangeAsync(IEnumerable<T> entities) =>
+            await Task.FromResult(_dbContext.Set<IEnumerable<T>>().Remove(entities));
+
+        #endregion
+
+        #region count
+        public int Count()
+        {
+            return _dbContext.Set<T>().Count();
+        }
+
+        public int Count(Expression<Func<T, bool>> where)
+        {
+            return _dbContext.Set<T>().Count(where);
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _dbContext.Set<T>().CountAsync();
+        }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> where)
+        {
+            return await _dbContext.Set<T>().CountAsync(where);
+        }
+
+        public long CountLong()
+        {
+            return _dbContext.Set<T>().LongCount();
+        }
+
+        public long CountLong(Expression<Func<T, bool>> where)
+        {
+            return _dbContext.Set<T>().LongCount(where);
+        }
+
+        public async Task<long> CountLongAsync()
+        {
+            return await _dbContext.Set<T>().LongCountAsync();
+        }
+
+        public async Task<long> CountLongAsync(Expression<Func<T, bool>> where)
+        {
+            return await _dbContext.Set<T>().LongCountAsync(where);
+        }
+
+        #endregion
+
+        #region Any
+        public bool Any()
+        {
+            return _dbContext.Set<T>().Any();
+        }
+
+        public bool Any(Expression<Func<T, bool>> where)
+        {
+            return _dbContext.Set<T>().Any(where);
+        }
+
+        public async Task<bool> AnyAsync()
+        {
+            return await _dbContext.Set<T>().AnyAsync();
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> where)
+        {
+            return await _dbContext.Set<T>().AnyAsync(where);
+        }
+        #endregion
+
 
         #region SaveChanges
         public int SaveChanges()
@@ -426,8 +747,6 @@ namespace RepositoryPattern.Services
             return await _dbContext.SaveChangesAsync(cancellationToken);
         }
         #endregion
-
-
 
         #region Transaction Management
 

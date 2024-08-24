@@ -33,20 +33,44 @@ namespace RepositoryPattern.Interfaces.Services
         #region First or Default
         T FirstOrDefault();
         Task<T> FirstOrDefaultAsync();
+        T FirstOrDefaultAsNoTracking();
+        Task<T> FirstOrDefaultAsyncAsNoTracking();
+
 
         T FirstOrDefault(Expression<Func<T, bool>> predicate);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        T FirstOrDefaultAsNoTracking(Expression<Func<T, bool>> predicate);
+        Task<T> FirstOrDefaultAsyncAsNoTracking(Expression<Func<T, bool>> predicate);
+
 
         T FirstOrDefault(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
         Task<T> FirstOrDefaultAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        T FirstOrDefaultAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<T> FirstOrDefaultAsyncAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
 
 
         T FirstOrDefault(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
-
+        T FirstOrDefaultAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<T> FirstOrDefaultAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
         #endregion
 
+        #region find
 
+        IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+
+        IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate);
+
+
+        IEnumerable<T> Find(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
+        IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
+        #endregion
 
         #region Add
         T Add(T entity);
@@ -60,6 +84,36 @@ namespace RepositoryPattern.Interfaces.Services
         Task<T> UpdateAsync(T entity);
         IEnumerable<T> UpdateRange(List<T> entities);
         Task<IEnumerable<T>> UpdateRangeAsync(List<T> entities);
+        #endregion
+
+        #region Delete
+        void Remove(T entity);
+        Task RemoveAsync(T entity);
+        void RemoveRange(IEnumerable<T> entities);
+        Task RemoveRangeAsync(IEnumerable<T> entities);
+        #endregion
+
+
+        #region Count
+        int Count();
+        int Count(Expression<Func<T, bool>> where);
+        Task<int> CountAsync();
+        Task<int> CountAsync(Expression<Func<T, bool>> where);
+
+
+        long CountLong();
+        long CountLong(Expression<Func<T, bool>> where);
+        Task<long> CountLongAsync();
+        Task<long> CountLongAsync(Expression<Func<T, bool>> where);
+
+
+        #endregion
+
+        #region Any
+        bool Any();
+        bool Any(Expression<Func<T, bool>> where);
+        Task<bool> AnyAsync();
+        Task<bool> AnyAsync(Expression<Func<T, bool>> where);
         #endregion
 
         #region Save Changes
