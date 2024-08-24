@@ -74,6 +74,33 @@ namespace RepositoryPattern.Interfaces.Services
 
         #region Add
         T Add(T entity);
+        /// <summary>
+        /// Asynchronously adds a new entity to the database context and returns the added entity.
+        /// </summary>
+        /// <param name="entity">
+        /// The entity to add to the database context. This entity is tracked by the context and will be inserted into the database when `SaveChanges` is called.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A cancellation token to observe while waiting for the asynchronous operation to complete. The default value is <see cref="CancellationToken.None"/>.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the added entity, which will be in the Added state in the context until changes are saved.
+        /// </returns>
+        /// <example>
+        /// <code>
+        /// // Create a new entity
+        /// var newEntity = new MyEntity { Name = "New Entity", Value = 123 };
+        ///
+        /// // Asynchronously add the new entity to the context
+        /// var addedEntity = await _repository.AddAsync(newEntity);
+        ///
+        /// // Save changes to persist the new entity in the database
+        /// await _dbContext.SaveChangesAsync();
+        /// </code>
+        /// </example>
+        /// <exception cref="OperationCanceledException">
+        /// Thrown if the operation is canceled by the <paramref name="cancellationToken"/>.
+        /// </exception>
         Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
         IEnumerable<T> AddRange(IEnumerable<T> entities, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
@@ -122,6 +149,7 @@ namespace RepositoryPattern.Interfaces.Services
         #endregion
 
         #region Transaction Management
+        IDbContextTransaction BeginTransaction();
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
