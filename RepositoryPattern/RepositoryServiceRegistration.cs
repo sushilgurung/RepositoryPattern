@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RepositoryPattern.Interfaces.Services;
-using RepositoryPattern.Services;
+using Gurung.RepositoryPattern.Interfaces.Services;
+using Gurung.RepositoryPattern.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RepositoryPattern
+namespace Gurung.RepositoryPattern
 {
     public static class RepositoryServiceRegistration
     {

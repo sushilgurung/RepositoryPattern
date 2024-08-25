@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using RepositoryPattern.Interfaces.Services;
+using Gurung.RepositoryPattern.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace RepositoryPattern.Services
+namespace Gurung.RepositoryPattern.Services
 {
     public class Repository<T> : IRepository<T> where T : class
     {

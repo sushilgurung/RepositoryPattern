@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PackageId>Gurung.RepositoryPattern</PackageId>
+		<Version>1.0.0</Version>
+		<Title>Repository Pattern</Title>
+		<Authors>Sushil Gurung</Authors>
+		<product></product>
+		<Description>The Repository Pattern provides a way to encapsulate data access logic and abstract away the details of data storage and retrieval. This approach promotes separation of concerns, making your application more maintainable and testable.</Description>
+		<RepositoryUrl>https://github.com/sushilgurung/RepositoryPattern</RepositoryUrl>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+	</PropertyGroup>
+</Project>
