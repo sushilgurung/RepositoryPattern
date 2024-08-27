@@ -9,6 +9,17 @@ This repository pattern implementation leverages Entity Framework Core (EF Core)
 ### Target Framework
 This project is built with .NET 5.0 and uses Entity Framework Core version 5.0.17.
 
+## Installation
+
+Install with .NET CLI
+```bash
+ dotnet add package Gurung.RepositoryPattern --version 1.0.0
+```
+Install with Package Manager
+```bash
+ NuGet\Install-Package Gurung.RepositoryPattern -Version 1.0.0
+```
+
 ## Repository Interface
 
 The `IRepository<T>` interface offers a wide range of methods for interacting with your data. Below is a summary of the available methods:
@@ -157,3 +168,13 @@ public async Task<MyEntity> GetTopActiveEntityAsync()
 }
 
 ```
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+
+This package is free to use for any purpose.
