@@ -7,17 +7,17 @@ The Repository Pattern provides a way to encapsulate data access logic and abstr
 This repository pattern implementation leverages Entity Framework Core (EF Core) for data access. It includes a generic repository interface that defines a comprehensive set of methods for querying, adding, updating, and deleting entities.
 
 ### Target Framework
-This project is built with .NET 5.0 and uses Entity Framework Core version 5.0.17.
+This project is built with .NET 7.0 and uses Entity Framework Core version 7.0.20.
 
 ## Installation
 
 Install with .NET CLI
 ```bash
- dotnet add package Gurung.RepositoryPattern --version 1.0.0
+ dotnet add package Gurung.RepositoryPattern --version 7.0.0
 ```
 Install with Package Manager
 ```bash
- NuGet\Install-Package Gurung.RepositoryPattern -Version 1.0.0
+ NuGet\Install-Package Gurung.RepositoryPattern -Version 7.0.0
 ```
 
 ## Repository Interface
