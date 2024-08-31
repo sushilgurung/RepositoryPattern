@@ -47,6 +47,6 @@
 		<RepositoryUrl>https://github.com/sushilgurung/RepositoryPattern</RepositoryUrl>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageTags>Repository Pattern, Gurung, Gurka</PackageTags>
+		<PackageTags>Repository Pattern,RepositoryPattern, Gurung, Gurka,repository-pattern, repository, data-access, repository-interface, repository-implementation, design-pattern, csharp, dotnet</PackageTags>
 	</PropertyGroup>
 </Project>
