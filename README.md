@@ -38,11 +38,7 @@ public class Startup
 
         // Register the repository service
         RepositoryServiceRegistration.ConfigureServices(services);
-
-        // Other service registrations
     }
-
-    // Other methods
 }
 ```
 
@@ -74,7 +70,7 @@ The `IRepository<T>` interface offers a wide range of methods for interacting wi
 
 ### Queryable
 
-- [`IQueryable<T> Queryable { get; }`](#Queryable)
+- [`IQueryable<T> Queryable { get; }`](#queryable-1)
 - `IQueryable<T> GetQueryable()`
 
 ### GeneratePredicate
