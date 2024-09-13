@@ -17,8 +17,28 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
         IEnumerable<T> GetAll();
         IEnumerable<T> GetAllAsNoTracking();
 
+        IEnumerable<T> GetAll(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        IEnumerable<T> GetAllAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> GetAllAsNoTrackingAsync();
+
+        Task<IEnumerable<T>> GetAllAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> GetAllAsNoTrackingAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        //
+
+        IEnumerable<T> GetAll(int pageNumber, int pageSize);
+        IEnumerable<T> GetAllAsNoTracking(int pageNumber, int pageSize);
+
+        IEnumerable<T> GetAll(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        IEnumerable<T> GetAllAsNoTracking(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
+        Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<T>> GetAllAsNoTrackingAsync(int pageNumber, int pageSize);
+
+        Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> GetAllAsNoTrackingAsync(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
 
         #endregion
 
@@ -57,17 +77,20 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
         #region find
 
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> Find(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        IEnumerable<T> Find(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
 
         IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate);
-        Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate);
-
-
-        IEnumerable<T> Find(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
-
         IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+
+        Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
+        Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
 
         #endregion
 
@@ -153,5 +176,9 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
         #endregion
+
+        Expression<Func<T, bool>> GeneratePredicate(Expression<Func<T, bool>> predicate);
+
+
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Gurung.RepositoryPattern.Helpers;
 
 namespace Gurung.RepositoryPattern.Services
 {
@@ -71,6 +72,8 @@ namespace Gurung.RepositoryPattern.Services
             return _dbContext.Set<T>();
         }
 
+
+
         #region Get All
         /// <summary>
         /// Retrieves all entities of the specified type <typeparamref name="T"/> from the data source.
@@ -117,10 +120,21 @@ namespace Gurung.RepositoryPattern.Services
         /// }
         /// </code>
         /// </example>
-
         public IEnumerable<T> GetAllAsNoTracking()
         {
             return _dbContext.Set<T>().AsNoTracking().ToList();
+        }
+
+        public IEnumerable<T> GetAll(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(null, orderBys).ToList();
+        }
+
+        public IEnumerable<T> GetAllAsNoTracking(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(null, orderBys).AsNoTracking().ToList();
         }
 
         /// <summary>
@@ -158,6 +172,65 @@ namespace Gurung.RepositoryPattern.Services
         {
             return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
         }
+
+        public async Task<IEnumerable<T>> GetAllAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(null, orderBys).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsNoTrackingAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(null, orderBys).AsNoTracking().ToListAsync();
+        }
+    
+        //
+        public IEnumerable<T> GetAll(int pageNumber, int pageSize)
+        {
+            return _dbContext.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        public IEnumerable<T> GetAllAsNoTracking(int pageNumber, int pageSize)
+        {
+            return _dbContext.Set<T>().AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+
+        public IEnumerable<T> GetAll(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(null, orderBys).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        public IEnumerable<T> GetAllAsNoTracking(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(null, orderBys).AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+        public async Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize)
+        {
+            return await _dbContext.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsNoTrackingAsync(int pageNumber, int pageSize)
+        {
+            return await _dbContext.Set<T>().AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(null, orderBys).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsNoTrackingAsync(int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(null, orderBys).AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+
         #endregion
 
         #region Get by Id
@@ -1000,89 +1073,6 @@ namespace Gurung.RepositoryPattern.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves all records that match the specified predicate.
-        /// </summary>
-        /// <param name="predicate">
-        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate.
-        /// The collection is returned as an enumerable list of entities.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if the <paramref name="predicate"/> is null.
-        /// </exception>
-        /// <example>
-        /// <code>
-        /// // Asynchronously define filtering criteria directly as a parameter
-        /// var activeUsers = await _repository.FindAsync(x => x.IsActive);
-        /// foreach (var user in activeUsers)
-        /// {
-        ///     Console.WriteLine($"{user.Name} is active.");
-        /// }
-        /// </code>
-        /// </example>
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbContext.Set<T>().Where(predicate).ToListAsync();
-        }
-
-        /// <summary>
-        /// Retrieves all records that match the specified predicate without tracking them in the context.
-        /// </summary>
-        /// <param name="predicate">
-        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
-        /// </param>
-        /// <returns>
-        /// A collection of entities that match the specified predicate and are not tracked by the context. The collection is returned as an enumerable list of entities.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if the <paramref name="predicate"/> is null.
-        /// </exception>
-        /// <example>
-        /// <code>
-        /// // Define filtering criteria directly as a parameter, without tracking
-        /// var activeUsers = _repository.FindAsNoTracking(x => x.IsActive);
-        /// foreach (var user in activeUsers)
-        /// {
-        ///     Console.WriteLine($"{user.Name} is active.");
-        /// }
-        /// </code>
-        /// </example>
-        public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate)
-        {
-            return _dbContext.Set<T>().Where(predicate).AsNoTracking().ToList();
-        }
-
-        /// <summary>
-        /// Asynchronously retrieves all records that match the specified predicate without tracking them in the context.
-        /// </summary>
-        /// <param name="predicate">
-        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate 
-        /// and are not tracked by the context. The collection is returned as an enumerable list of entities.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if the <paramref name="predicate"/> is null.
-        /// </exception>
-        /// <example>
-        /// <code>
-        /// // Asynchronously define filtering criteria directly as a parameter, without tracking
-        /// var activeUsers = await _repository.FindAsyncAsNoTracking(x => x.IsActive);
-        /// foreach (var user in activeUsers)
-        /// {
-        ///     Console.WriteLine($"{user.Name} is active.");
-        /// }
-        /// </code>
-        /// </example>
-        public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbContext.Set<T>().Where(predicate).AsNoTracking().ToListAsync();
-        }
-
-        /// <summary>
         /// Retrieves all records that match the specified predicate, applying sorting criteria based on the provided order-by specifications.
         /// </summary>
         /// <param name="predicate">
@@ -1144,66 +1134,38 @@ namespace Gurung.RepositoryPattern.Services
             return orderedQuery.ToList();
         }
 
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(predicate, orderBys).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+
         /// <summary>
-        /// Asynchronously retrieves all records that match the specified predicate, applying sorting criteria based on the provided order-by specifications.
+        /// Retrieves all records that match the specified predicate without tracking them in the context.
         /// </summary>
         /// <param name="predicate">
         /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
         /// </param>
-        /// <param name="orderBys">
-        /// A variable number of tuples where each tuple consists of an expression specifying the property to sort by 
-        /// and a boolean indicating whether the sorting should be in descending order. 
-        /// For example, (x => x.Name, false) sorts by Name in ascending order, while (x => x.Population, true) sorts by Population in descending order.
-        /// </param>
         /// <returns>
-        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate 
-        /// and are sorted according to the provided order-by criteria. The collection is returned as an enumerable list of entities.
+        /// A collection of entities that match the specified predicate and are not tracked by the context. The collection is returned as an enumerable list of entities.
         /// </returns>
         /// <exception cref="ArgumentNullException">
         /// Thrown if the <paramref name="predicate"/> is null.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        /// Thrown if no order-by selectors are provided or if the <paramref name="orderBys"/> parameter is null or empty.
-        /// </exception>
         /// <example>
         /// <code>
-        /// // Asynchronously define filtering and sorting criteria directly as parameters
-        /// var results = await _repository.FindAsync(
-        ///     x => x.IsActive,               // Filter by IsActive property
-        ///     (x => x.Name, false),         // Sort by Name in ascending order
-        ///     (x => x.Population, true)     // Then by Population in descending order
-        /// );
-        /// foreach (var item in results)
+        /// // Define filtering criteria directly as a parameter, without tracking
+        /// var activeUsers = _repository.FindAsNoTracking(x => x.IsActive);
+        /// foreach (var user in activeUsers)
         /// {
-        ///     Console.WriteLine($"{item.Name}: {item.Population}");
+        ///     Console.WriteLine($"{user.Name} is active.");
         /// }
         /// </code>
         /// </example>
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate)
         {
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
-
-            if (orderBys == null || !orderBys.Any())
-                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
-
-            IQueryable<T> query = _dbContext.Set<T>().Where(predicate);
-
-            // Apply the first sorting criterion
-            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
-                ? query.OrderByDescending(orderBys[0].KeySelector)
-                : query.OrderBy(orderBys[0].KeySelector);
-
-            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
-            for (int i = 1; i < orderBys.Length; i++)
-            {
-                // Additional sorting orders
-                var orderBy = orderBys[i];
-                orderedQuery = orderBy.Descending
-                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
-                    : orderedQuery.ThenBy(orderBy.KeySelector);
-            }
-            return await orderedQuery.ToListAsync();
+            return _dbContext.Set<T>().Where(predicate).AsNoTracking().ToList();
         }
 
         /// <summary>
@@ -1243,29 +1205,121 @@ namespace Gurung.RepositoryPattern.Services
         /// </example>
         public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
         {
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(predicate, orderBys).AsNoTracking().ToList();
+        }
 
-            if (orderBys == null || !orderBys.Any())
-                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
+        public IEnumerable<T> FindAsNoTracking(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return query.FilterAndOrderBy(predicate, orderBys).AsNoTracking().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
 
-            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
 
-            // Apply the first sorting criterion
-            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
-                ? query.OrderByDescending(orderBys[0].KeySelector)
-                : query.OrderBy(orderBys[0].KeySelector);
 
-            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
-            for (int i = 1; i < orderBys.Length; i++)
-            {
-                // Additional sorting orders
-                var orderBy = orderBys[i];
-                orderedQuery = orderBy.Descending
-                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
-                    : orderedQuery.ThenBy(orderBy.KeySelector);
-            }
-            return orderedQuery.AsNoTracking().ToList();
+        /// <summary>
+        /// Asynchronously retrieves all records that match the specified predicate.
+        /// </summary>
+        /// <param name="predicate">
+        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate.
+        /// The collection is returned as an enumerable list of entities.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the <paramref name="predicate"/> is null.
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// // Asynchronously define filtering criteria directly as a parameter
+        /// var activeUsers = await _repository.FindAsync(x => x.IsActive);
+        /// foreach (var user in activeUsers)
+        /// {
+        ///     Console.WriteLine($"{user.Name} is active.");
+        /// }
+        /// </code>
+        /// </example>
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).ToListAsync();
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves all records that match the specified predicate, applying sorting criteria based on the provided order-by specifications.
+        /// </summary>
+        /// <param name="predicate">
+        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
+        /// </param>
+        /// <param name="orderBys">
+        /// A variable number of tuples where each tuple consists of an expression specifying the property to sort by 
+        /// and a boolean indicating whether the sorting should be in descending order. 
+        /// For example, (x => x.Name, false) sorts by Name in ascending order, while (x => x.Population, true) sorts by Population in descending order.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate 
+        /// and are sorted according to the provided order-by criteria. The collection is returned as an enumerable list of entities.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the <paramref name="predicate"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Thrown if no order-by selectors are provided or if the <paramref name="orderBys"/> parameter is null or empty.
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// // Asynchronously define filtering and sorting criteria directly as parameters
+        /// var results = await _repository.FindAsync(
+        ///     x => x.IsActive,               // Filter by IsActive property
+        ///     (x => x.Name, false),         // Sort by Name in ascending order
+        ///     (x => x.Population, true)     // Then by Population in descending order
+        /// );
+        /// foreach (var item in results)
+        /// {
+        ///     Console.WriteLine($"{item.Name}: {item.Population}");
+        /// }
+        /// </code>
+        /// </example>
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(predicate, orderBys).ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(predicate, orderBys).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Asynchronously retrieves all records that match the specified predicate without tracking them in the context.
+        /// </summary>
+        /// <param name="predicate">
+        /// An expression that defines the criteria for selecting the entities. This expression is used to filter the entities that are returned.
+        /// </param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a collection of entities that match the specified predicate 
+        /// and are not tracked by the context. The collection is returned as an enumerable list of entities.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the <paramref name="predicate"/> is null.
+        /// </exception>
+        /// <example>
+        /// <code>
+        /// // Asynchronously define filtering criteria directly as a parameter, without tracking
+        /// var activeUsers = await _repository.FindAsyncAsNoTracking(x => x.IsActive);
+        /// foreach (var user in activeUsers)
+        /// {
+        ///     Console.WriteLine($"{user.Name} is active.");
+        /// }
+        /// </code>
+        /// </example>
+        public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().Where(predicate).AsNoTracking().ToListAsync();
         }
 
         /// <summary>
@@ -1305,29 +1359,14 @@ namespace Gurung.RepositoryPattern.Services
         /// </example>
         public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
         {
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(predicate, orderBys).AsNoTracking().ToListAsync();
+        }
 
-            if (orderBys == null || !orderBys.Any())
-                throw new ArgumentException("Order by selectors cannot be null or empty", nameof(orderBys));
-
-            IQueryable<T> query = _dbContext.Set<T>().Where(predicate).AsNoTracking();
-
-            // Apply the first sorting criterion
-            IOrderedQueryable<T> orderedQuery = orderBys[0].Descending
-                ? query.OrderByDescending(orderBys[0].KeySelector)
-                : query.OrderBy(orderBys[0].KeySelector);
-
-            // Apply subsequent sorting criteria using ThenBy or ThenByDescending
-            for (int i = 1; i < orderBys.Length; i++)
-            {
-                // Additional sorting orders
-                var orderBy = orderBys[i];
-                orderedQuery = orderBy.Descending
-                    ? orderedQuery.ThenByDescending(orderBy.KeySelector)
-                    : orderedQuery.ThenBy(orderBy.KeySelector);
-            }
-            return await orderedQuery.AsNoTracking().ToListAsync();
+        public async Task<IEnumerable<T>> FindAsyncAsNoTracking(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize, params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            return await query.FilterAndOrderBy(predicate, orderBys).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync();
         }
 
 
@@ -2141,6 +2180,11 @@ namespace Gurung.RepositoryPattern.Services
         }
 
         #endregion
+
+        public Expression<Func<T, bool>> GeneratePredicate(Expression<Func<T, bool>> predicate)
+        {
+            return predicate;
+        }
 
 
     }
