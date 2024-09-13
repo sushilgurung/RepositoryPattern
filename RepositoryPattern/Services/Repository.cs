@@ -184,7 +184,7 @@ namespace Gurung.RepositoryPattern.Services
             IQueryable<T> query = _dbContext.Set<T>();
             return await query.FilterAndOrderBy(null, orderBys).AsNoTracking().ToListAsync();
         }
-    
+
         //
         public IEnumerable<T> GetAll(int pageNumber, int pageSize)
         {
@@ -251,43 +251,9 @@ namespace Gurung.RepositoryPattern.Services
         /// <code>
         /// // Retrieve an entity of type T with a specific ID
         /// var entity = _repository.GetById(1);
-        /// if (entity != null)
-        /// {
-        ///     Console.WriteLine(entity.Name);
-        /// }
         /// </code>
         /// </example>
-
         public T GetById(int id)
-        {
-            return _dbContext.Set<T>().Find(id);
-        }
-
-        /// <summary>
-        /// Retrieves an entity of the specified type <typeparamref name="T"/> by its primary key.
-        /// </summary>
-        /// <param name="id">
-        /// The primary key value of the entity to be retrieved as a <see cref="long"/>.
-        /// </param>
-        /// <returns>
-        /// The entity of type <typeparamref name="T"/> with the specified primary key value, or null if no entity is found.
-        /// </returns>
-        /// <remarks>
-        /// This method queries the database for an entity with the given primary key of type <see cref="long"/> and returns it. 
-        /// If no entity with the specified key is found, the method returns null.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// // Retrieve an entity of type T with a specific long ID
-        /// var entity = _repository.GetById(1000000001L);
-        /// if (entity != null)
-        /// {
-        ///     Console.WriteLine(entity.Name);
-        /// }
-        /// </code>
-        /// </example>
-
-        public T GetById(long id)
         {
             return _dbContext.Set<T>().Find(id);
         }
@@ -310,16 +276,50 @@ namespace Gurung.RepositoryPattern.Services
         /// <code>
         /// // Asynchronously retrieve an entity of type T with a specific ID
         /// var entity = await _repository.GetByIdAsync(1);
-        /// if (entity != null)
-        /// {
-        ///     Console.WriteLine(entity.Name);
-        /// }
         /// </code>
         /// </example>
-
         public async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
+        }
+        public T GetByIdAsNoTracking(int id)
+        {
+            var entity = _dbContext.Set<T>().Find(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+        public async Task<T> GetByIdAsNoTrackingAsync(int id)
+        {
+            var entity = await _dbContext.Set<T>().FindAsync(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+
+
+
+        /// <summary>
+        /// Retrieves an entity of the specified type <typeparamref name="T"/> by its primary key.
+        /// </summary>
+        /// <param name="id">
+        /// The primary key value of the entity to be retrieved as a <see cref="long"/>.
+        /// </param>
+        /// <returns>
+        /// The entity of type <typeparamref name="T"/> with the specified primary key value, or null if no entity is found.
+        /// </returns>
+        /// <remarks>
+        /// This method queries the database for an entity with the given primary key of type <see cref="long"/> and returns it. 
+        /// If no entity with the specified key is found, the method returns null.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Retrieve an entity of type T with a specific long ID
+        /// var entity = _repository.GetById(1000000001L);
+        /// </code>
+        /// </example>
+        public T GetById(long id)
+        {
+            return _dbContext.Set<T>().Find(id);
         }
 
         /// <summary>
@@ -340,16 +340,74 @@ namespace Gurung.RepositoryPattern.Services
         /// <code>
         /// // Asynchronously retrieve an entity of type T with a specific long ID
         /// var entity = await _repository.GetByIdAsync(10000000001L);
-        /// if (entity != null)
-        /// {
-        ///     Console.WriteLine(entity.Name);
-        /// }
         /// </code>
         /// </example>
-
         public async Task<T> GetByIdAsync(long id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public T GetByIdAsNoTracking(long id)
+        {
+            var entity = _dbContext.Set<T>().Find(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+        public async Task<T> GetByIdAsNoTrackingAsync(long id)
+        {
+            var entity = await _dbContext.Set<T>().FindAsync(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+        public T GetById(string id)
+        {
+            return _dbContext.Set<T>().Find(id);
+        }
+
+        public async Task<T> GetByIdAsync(string id)
+        {
+            return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public T GetByIdAsNoTracking(string id)
+        {
+            var entity = _dbContext.Set<T>().Find(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+        public async Task<T> GetByIdAsNoTrackingAsync(string id)
+        {
+            var entity = await _dbContext.Set<T>().FindAsync(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+
+        public T GetById(Guid id)
+        {
+            return _dbContext.Set<T>().Find(id);
+        }
+
+        public async Task<T> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public T GetByIdAsNoTracking(Guid id)
+        {
+            var entity = _dbContext.Set<T>().Find(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
+        }
+
+        public async Task<T> GetByIdAsNoTrackingAsync(Guid id)
+        {
+            var entity = await _dbContext.Set<T>().FindAsync(id);
+            _dbContext.Entry(entity).State = EntityState.Detached;
+            return entity;
         }
 
         #endregion
@@ -2186,6 +2244,6 @@ namespace Gurung.RepositoryPattern.Services
             return predicate;
         }
 
-
+   
     }
 }

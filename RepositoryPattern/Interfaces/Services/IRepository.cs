@@ -12,6 +12,7 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
     {
         IQueryable<T> Queryable { get; }
         IQueryable<T> GetQueryable();
+        Expression<Func<T, bool>> GeneratePredicate(Expression<Func<T, bool>> predicate);
 
         #region Get
         IEnumerable<T> GetAll();
@@ -25,7 +26,6 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
 
         Task<IEnumerable<T>> GetAllAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
         Task<IEnumerable<T>> GetAllAsNoTrackingAsync(params (Expression<Func<T, object>> KeySelector, bool Descending)[] orderBys);
-        //
 
         IEnumerable<T> GetAll(int pageNumber, int pageSize);
         IEnumerable<T> GetAllAsNoTracking(int pageNumber, int pageSize);
@@ -44,9 +44,26 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
 
         #region GetById
         T GetById(int id);
-        T GetById(long id);
         Task<T> GetByIdAsync(int id);
+        T GetByIdAsNoTracking(int id);
+        Task<T> GetByIdAsNoTrackingAsync(int id);
+
+        T GetById(long id);
         Task<T> GetByIdAsync(long id);
+        T GetByIdAsNoTracking(long id);
+        Task<T> GetByIdAsNoTrackingAsync(long id);
+
+
+        T GetById(string id);
+        Task<T> GetByIdAsync(string id);
+        T GetByIdAsNoTracking(string id);
+        Task<T> GetByIdAsNoTrackingAsync(string id);
+
+        T GetById(Guid id);
+        Task<T> GetByIdAsync(Guid id);
+        T GetByIdAsNoTracking(Guid id);
+        Task<T> GetByIdAsNoTrackingAsync(Guid id);
+
         #endregion
 
         #region First or Default
@@ -177,7 +194,7 @@ namespace Gurung.RepositoryPattern.Interfaces.Services
         Task RollbackTransactionAsync();
         #endregion
 
-        Expression<Func<T, bool>> GeneratePredicate(Expression<Func<T, bool>> predicate);
+  
 
 
     }
