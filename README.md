@@ -7,15 +7,15 @@ The Repository Pattern provides a way to encapsulate data access logic and abstr
 
 
 ## Target Framework
-This project is built with .NET 5.0 and uses Entity Framework Core version 5.0.17.## Installation
+This project is built with .NET 9.0 and uses Entity Framework Core version 8.0.8.## Installation
 
 Install with .NET CLI
 ```bash
- dotnet add package Gurung.RepositoryPattern --version 1.0.0
+ dotnet add package Gurung.RepositoryPattern --version 9.0.0
 ```
 Install with Package Manager
 ```bash
- NuGet\Install-Package Gurung.RepositoryPattern -Version 1.0.0
+ NuGet\Install-Package Gurung.RepositoryPattern -Version 9.0.0
 ```
 
     

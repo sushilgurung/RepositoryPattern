@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
@@ -34,17 +34,17 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
 	</ItemGroup>
 
 	<PropertyGroup>
 		<PackageId>Gurung.RepositoryPattern</PackageId>
-		<Version>1.0.0</Version>
+		<Version>9.0.0</Version>
 		<Title>Repository Pattern</Title>
 		<Authors>Sushil Gurung</Authors>
 		<product></product>
 		<Description>The Repository Pattern provides a way to encapsulate data access logic and abstract away the details of data storage and retrieval. This approach promotes separation of concerns, making your application more maintainable and testable.</Description>
-		<RepositoryUrl>https://github.com/sushilgurung/RepositoryPattern</RepositoryUrl>
+		<RepositoryUrl>https://github.com/sushilgurung/RepositoryPattern/tree/release/9.0.0</RepositoryUrl>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>Repository Pattern,RepositoryPattern, Gurung, Gurka,repository-pattern, repository, data-access, repository-interface, repository-implementation, design-pattern, csharp, dotnet</PackageTags>
