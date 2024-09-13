@@ -71,7 +71,7 @@ The `IRepository<T>` interface offers a wide range of methods for interacting wi
 ### Queryable
 
 - [`IQueryable<T> Queryable { get; }`](#queryable-1)
-- `IQueryable<T> GetQueryable()`
+- [`IQueryable<T> GetQueryable()`](#using-getqueryable)
 
 ### GeneratePredicate
 
