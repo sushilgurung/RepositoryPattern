@@ -75,7 +75,7 @@ The `IRepository<T>` interface offers a wide range of methods for interacting wi
 
 ### GeneratePredicate
 
-- `Expression<Func<T, bool>> GeneratePredicate()`
+- [`Expression<Func<T, bool>> GeneratePredicate()`](#generatepredicate-1)
 
 ### GetAll
 
