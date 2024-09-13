@@ -11,11 +11,11 @@ This project is built with .NET 5.0 and uses Entity Framework Core version 5.0.1
 
 Install with .NET CLI
 ```bash
- dotnet add package Gurung.RepositoryPattern --version 5.0.0
+ dotnet add package Gurung.RepositoryPattern --version 5.0.1
 ```
 Install with Package Manager
 ```bash
- NuGet\Install-Package Gurung.RepositoryPattern -Version 5.0.0
+ NuGet\Install-Package Gurung.RepositoryPattern -Version 5.0.1
 ```
 
     
