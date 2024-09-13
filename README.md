@@ -38,11 +38,7 @@ public class Startup
 
         // Register the repository service
         RepositoryServiceRegistration.ConfigureServices(services);
-
-        // Other service registrations
     }
-
-    // Other methods
 }
 ```
 
@@ -74,14 +70,14 @@ The `IRepository<T>` interface offers a wide range of methods for interacting wi
 
 ### Queryable
 
-- [`IQueryable<T> Queryable { get; }`](#Repository-Interface)
-- `IQueryable<T> GetQueryable()`
+- [`IQueryable<T> Queryable { get; }`](#queryable-1)
+- [`IQueryable<T> GetQueryable()`](#using-getqueryable)
 
 ### GeneratePredicate
 
-- `Expression<Func<T, bool>> GeneratePredicate()`
+- [`Expression<Func<T, bool>> GeneratePredicate()`](#generatepredicate-1)
 
-### Get
+### GetAll
 
 - `IEnumerable<T> GetAll()`
 - `IEnumerable<T> GetAllAsNoTracking()`
@@ -107,6 +103,22 @@ The `IRepository<T>` interface offers a wide range of methods for interacting wi
 - `T GetById(long id)`
 - `Task<T> GetByIdAsync(int id)`
 - `Task<T> GetByIdAsync(long id)`
+- `T GetByIdAsNoTracking(int id)`
+- `T GetByIdAsNoTracking(long id)`
+- `Task<T> GetByIdAsNoTrackingAsync(int id)`
+- `Task<T> GetByIdAsNoTrackingAsync(long id)`
+
+
+- `T GetById(string id)`
+- `Task<T> GetByIdAsync(string id)`
+- `T GetByIdAsNoTracking(string id)`
+- `Task<T> GetByIdAsNoTrackingAsync(string id)`
+
+- `T GetById(Guid id)`
+- `Task<T> GetByIdAsync(Guid id)`
+- `T GetByIdAsNoTracking(Guid id)`
+- `Task<T> GetByIdAsNoTrackingAsync(Guid id)`
+
 
 ### FirstOrDefault
 
@@ -434,6 +446,19 @@ var asyncSortedProducts = await repository.GetAllAsync(1, 10, (p => p.Price, fal
 #### GetAllAsNoTrackingAsync (with sorting and pagination)
 ```csharp
 var asyncSortedProducts = await repository.GetAllAsNoTrackingAsync(1, 10, (p => p.Price, false), (p => p.Name, true));
+```
+
+
+## Using GetById
+Retrieves a single entity of type T from the database using its primary key (PK),  types: string, int, long, and Guid. This method queries the database context to find the entity that matches the given primary key value.
+
+#### GetById (int)(long)(string)(Guid)
+
+```csharp
+var entityInt = _countryRepository.GetById(123);
+var entityLong = _countryRepository.GetById(9876543210L);
+var entityString = _countryRepository.GetById("abc123");
+var entityGuid = _countryRepository.GetById(Guid.Parse("31ab6f9a-bb12-4359-9a2d-c92027ba50c6"));
 ```
 
 ### Using `FirstOrDefaultAsync`
@@ -939,6 +964,77 @@ public IEnumerable<MyEntity> AddEntitiesRangeWithCancellation(IEnumerable<MyEnti
 }
 ```
 
+## Update
+
+#### Update
+Synchronously updates a single entity of type T in the database context. This method marks the entity as modified, and the changes will be persisted when SaveChanges is called.
+```csharp
+// Retrieve the entity to update
+var entityToUpdate = _countryRepository.GetById(100);
+
+// Modify the entity
+entityToUpdate.Name = "Updated Name";
+
+// Update the entity
+var updatedEntity = _countryRepository.Update(entityToUpdate);
+
+// Save changes to the database
+_countryRepository.SaveChanges();
+```
+
+#### UpdateAsync
+Asynchronously updates a single entity of type T in the database context. This method marks the entity as modified and will persist changes once SaveChangesAsync is called.
+```csharp
+// Retrieve the entity to update
+var entityToUpdate = await _countryRepository.GetById(10002);
+
+// Modify the entity
+entityToUpdate.Name = "Updated Name";
+
+// Asynchronously update the entity
+var updatedEntity = await _countryRepository.UpdateAsync(entityToUpdate);
+
+// Save changes asynchronously to the database
+await _countryRepository.SaveChangesAsync();
+```
+
+#### UpdateRange
+Synchronously updates a range of entities of type T in the database context. This method marks each entity in the collection as modified and will persist the changes once SaveChanges is called.
+```csharp
+// Retrieve the entities to update
+var entitiesToUpdate = _countryRepository.Find(e => e.SomeCondition);
+
+// Modify each entity
+foreach (var entity in entitiesToUpdate)
+{
+    entity.Name = "Updated Name";
+}
+
+// Update the entities in the repository
+var updatedEntities = _countryRepository.UpdateRange(entitiesToUpdate);
+
+// Save changes to the database
+_countryRepository.SaveChanges();
+```
+#### UpdateRangeAsync
+Asynchronously updates a range of entities of type T in the database context. This method marks each entity in the collection as modified and will persist the changes once SaveChangesAsync is called.
+```csharp
+// Retrieve the entities to update
+var entitiesToUpdate = await _countryRepository.Find(e => e.SomeCondition);
+
+// Modify each entity
+foreach (var entity in entitiesToUpdate)
+{
+    entity.Name = "Updated Name";
+}
+
+// Asynchronously update the entities in the repository
+var updatedEntities = await _countryRepository.UpdateRangeAsync(entitiesToUpdate);
+
+// Save changes asynchronously to the database
+await _countryRepository.SaveChangesAsync();
+```
+
 
 ## Remove
 Removes or Delete data from database
@@ -990,4 +1086,132 @@ await _countryRepository.RemoveRangeAsync(entitiesToRemove);
 
 // Save changes to persist the removal to the database
 await _countryRepository.SaveChangesAsync();
+```
+
+## Count 
+
+#### Count()
+Synchronously counts the total number of records of type T in the database.
+```csharp
+// Count all entities in the repository
+int totalEntities = _countryRepository.Count();
+Console.WriteLine($"Total entities: {totalEntities}");
+```
+
+#### Count() with with filtering
+Synchronously counts the number of records that match a given condition (predicate).
+```csharp
+// Count entities where the country name starts with 'A'
+int count = _countryRepository.Count(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Countries starting with 'A': {count}");
+```
+
+#### CountAsync()
+Asynchronously counts the total number of records of type T in the database.
+```csharp
+// Asynchronously count all entities in the repository
+int totalEntities = await _countryRepository.CountAsync();
+Console.WriteLine($"Total entities: {totalEntities}");
+```
+
+#### CountAsync() with with filtering
+Asynchronously counts the number of records that match a given condition (predicate).
+```csharp
+// Asynchronously count entities where the country name starts with 'A'
+int count = await _countryRepository.CountAsync(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Countries starting with 'A': {count}");
+```
+
+#### CountLong()
+Synchronously counts the total number of records of type T in the database, returning a long result for large datasets.
+```csharp
+// Count all entities with a long result type
+long totalEntities = _countryRepository.CountLong();
+Console.WriteLine($"Total entities (long): {totalEntities}");
+```
+
+#### CountLong() with with filtering
+Synchronously counts the number of records that match a given condition (predicate), returning a long result for large datasets.
+```csharp
+// Count entities where the country name starts with 'A' and return as long
+long count = _countryRepository.CountLong(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Countries starting with 'A' (long): {count}");
+```
+
+#### CountLongAsync()
+Asynchronously counts the total number of records of type T in the database, returning a long result for large datasets.
+```csharp
+// Asynchronously count all entities with a long result type
+long totalEntities = await _countryRepository.CountLongAsync();
+Console.WriteLine($"Total entities (long): {totalEntities}");
+```
+
+#### CountLongAsync() with filtering
+Asynchronously counts the number of records that match a given condition (predicate), returning a long result for large datasets.
+```csharp
+// Asynchronously count entities where the country name starts with 'A' and return as long
+long count = await _countryRepository.CountLongAsync(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Countries starting with 'A' (long): {count}");
+```
+
+## Any
+#### Any()
+Synchronously checks whether any entities of type T exist in the database.
+```csharp
+// Check if there are any entities in the repository
+bool hasEntities = _countryRepository.Any();
+Console.WriteLine($"Any entities in the repository: {hasEntities}");
+```
+
+#### Any() with filtering
+Synchronously checks whether any entities that match the specified condition (predicate) exist in the database.
+```csharp
+// Check if there are any entities where the country name starts with 'A'
+bool hasEntities = _countryRepository.Any(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Any countries starting with 'A': {hasEntities}");
+```
+
+#### AnyAsync()
+Asynchronously checks whether any entities of type T exist in the database.
+```csharp
+// Asynchronously check if there are any entities in the repository
+bool hasEntities = await _countryRepository.AnyAsync();
+Console.WriteLine($"Any entities in the repository: {hasEntities}");
+```
+
+#### AnyAsync() with filtering
+Asynchronously checks whether any entities that match the specified condition (predicate) exist in the database.
+```csharp
+// Asynchronously check if there are any entities where the country name starts with 'A'
+bool hasEntities = await _countryRepository.AnyAsync(c => c.Name.StartsWith("A"));
+Console.WriteLine($"Any countries starting with 'A': {hasEntities}");
+```
+
+#### Transaction Management
+Starts a new database transaction synchronously. This is useful when you want to execute multiple database operations as a single atomic operation.
+```csharp
+public void ExecuteWithTransaction()
+{
+    using (var transaction = _countryRepository.BeginTransaction())
+    {
+        try
+        {
+            // Perform multiple database operations
+            _countryRepository.Add(new Country { Name = "Nepal" });
+            _countryRepository.SaveChanges();
+
+            _countryRepository.Add(new Country { Name = "UK" });
+            _countryRepository.SaveChanges();
+
+            // Commit the transaction
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            // Rollback the transaction if any operation fails
+            transaction.Rollback();
+            throw; // Re-throw the exception
+        }
+    }
+}
 ```
